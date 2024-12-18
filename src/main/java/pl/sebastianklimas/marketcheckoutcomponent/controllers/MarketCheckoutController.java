@@ -25,7 +25,7 @@ public class MarketCheckoutController {
         return ResponseEntity.ok(marketService.scanProducts(products));
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ExceptionHandler({HttpMessageNotReadableException.class, NullPointerException.class})
     public ResponseEntity<Object> handleHttpMessageNotReadableException() {
         Map<String, Object> body = new HashMap<>();
         body.put("message", "Cannot read request data, make sure, you're using JSON file with array of products structured like this: [{\"id\": 1, \"name\": \"Mleko\", \"regularPrice\": 9.99}], for more info check out GitHub project.");
