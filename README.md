@@ -35,6 +35,8 @@ Komponent działa w 6 krokach.
 ## Moje wybory
 ### Model
 Zdecydowałem się na jeden model produktu, który zawiera wszystkie możliwe pola, z możliwością zostawienia w niektórych polach `null`. Uważam, że to dobre rozwiązanie, ponieważ nadaje przejrzystości i upraszcza czytanie kodu, w porównaniu z wersją, w której korzystam z dziedziczenia.
+### Pakiety
+Zaimplementowałem tworzenie pakietów tak, aby miały jak największą kompatybilność z potencjalną bazą danych. Podczas łączenia w pakiety, tak samo obsługujemy sytuację, w której pakiet jest zainicjowany z tylko jednego produktu, jak w sytuacji, gdy oba produkty mają informację o pakiecie. A także zabezpieczam się przed sytuacją, gdy jeden produkt może być podłączony do 2 produktów tworząc 2 pakiety.
 
 ## Przykładowy JSON
 ```JSON
