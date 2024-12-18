@@ -94,24 +94,33 @@ public class MarketService {
     private List<FinalProduct> mapToFinalProduct(List<Product> products) {
         return products.stream()
                 .map(this::createFinalProductFromProduct)
+                .flatMap(List::stream)
                 .toList();
     }
 
-    private FinalProduct createFinalProductFromProduct(Product product) {
+    private List<FinalProduct> createFinalProductFromProduct(Product product) {
         if (!product.getMultiPrice() || product.getQuantity() < product.getRequiredQuantity()) {
-            return new FinalProduct(
-                    product.getName(),
-                    product.getRegularPrice(),
-                    product.getQuantity()
-            );
+            return List.of(
+                    new FinalProduct(
+                            product.getName(),
+                            product.getRegularPrice(),
+                            product.getQuantity()
+                    ));
         }
+        int quantity = product.getQuantity();
+        int requiredQuantity = product.getRequiredQuantity();
+        int productsWithoutMultiPrice = quantity % requiredQuantity;
 
-        return new FinalProduct(
+        FinalProduct mainFinalProduct = new FinalProduct(
                 product.getName(),
                 product.getSpecialPrice(),
-                product.getQuantity(),
+                (quantity / requiredQuantity) * requiredQuantity,
                 product.getRegularPrice()
         );
+
+        FinalProduct extraFinalProduct = productsWithoutMultiPrice > 0 ? new FinalProduct(product.getName(), product.getRegularPrice(), productsWithoutMultiPrice) : null;
+
+        return extraFinalProduct == null ? List.of(mainFinalProduct) : List.of(mainFinalProduct, extraFinalProduct);
     }
 
     private BigDecimal calculateFinalSum(List<FinalProduct> products, BigDecimal bundlesDiscount) {

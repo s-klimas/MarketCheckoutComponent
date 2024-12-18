@@ -326,7 +326,7 @@ class MarketServiceTest {
     }
 
     @Test
-    void test_ScanProduct_withMultiPriceProductButNotEnoughOfThemToTriggerSpecialPrice_shouldReturnListWithRegularPrice() {
+    void test_ScanProduct_withMultiPriceProductButNotEnoughOfThemToTriggerSpecialPriceForAllOfThem_shouldReturnListWithSomeSpecialPriceAndSomeRegularPrice() {
         // given
         ProductDto lego = new ProductDto();
         lego.setId(2L);
@@ -336,20 +336,24 @@ class MarketServiceTest {
         lego.setSpecialPrice(BigDecimal.valueOf(24.99));
         lego.setRequiredQuantity(3);
 
-        List<ProductDto> products = List.of(lego);
+        List<ProductDto> products = List.of(lego, lego, lego, lego, lego);
 
         // when
         CartDto result = marketService.scanProducts(products);
 
         // then
-        assertEquals(1, result.getProducts().size());
+        assertEquals(2, result.getProducts().size());
 
         assertEquals("Lego", result.getProducts().get(0).getName());
-        assertEquals(1, result.getProducts().get(0).getQuantity());
-        assertEquals(BigDecimal.valueOf(29.99), result.getProducts().get(0).getPrice());
-        assertNull(result.getProducts().get(0).getOldPrice());
+        assertEquals(3, result.getProducts().get(0).getQuantity());
+        assertEquals(BigDecimal.valueOf(24.99), result.getProducts().get(0).getPrice());
+        assertEquals(BigDecimal.valueOf(29.99), result.getProducts().get(0).getOldPrice());
 
-        assertEquals(BigDecimal.valueOf(29.99), result.getSumPrice());
+        assertEquals("Lego", result.getProducts().get(1).getName());
+        assertEquals(2, result.getProducts().get(1).getQuantity());
+        assertEquals(BigDecimal.valueOf(29.99), result.getProducts().get(1).getPrice());
+
+        assertEquals(BigDecimal.valueOf(29.99).multiply(BigDecimal.valueOf(2)).add(BigDecimal.valueOf(24.99).multiply(BigDecimal.valueOf(3))), result.getSumPrice());
         assertEquals(0, result.getBundles().size());
         assertEquals(BigDecimal.ZERO, result.getBundlesDiscount());
     }
